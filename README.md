@@ -1,2 +1,2 @@
-# the_gentleman_guide
+# The Gentleman's Guide
 Barber Guide
