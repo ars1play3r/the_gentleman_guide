@@ -3,19 +3,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Gentleman's Guide - Aprende Barbería</title>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
-  <meta name="theme-color" content="#D4AF37">
-
-  <!-- Web App Manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
+  
   <!-- React 18 Dependencies from JSDelivr -->
   <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
@@ -48,55 +36,30 @@
       }
     }
   </script>
-
+  
   <!-- Custom Styles -->
   <link href="app-styles.css" rel="stylesheet">
   <link href="auth-styles.css" rel="stylesheet">
-  
-  <script type="importmap">
-    {
-      "imports": {
-        "react": "https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js",
-        "react-dom/client": "https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js",
-        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js",
-        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"
-      }
-    }
-  </script>
 </head>
 <body class="bg-light-gray">
-  <!-- Auth Container (moved to top) -->
-  <div id="auth-container"></div>
+  <div id="root"></div>
   
-  <!-- Main App -->
-  <div id="app-container"></div>
+  <!-- Config -->
+  <script src="config.js"></script>
   
-  <!-- Admin Dashboard Container -->
-  <div id="admin-dashboard-container"></div>
-
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registered: ', registration);
-          })
-          .catch(error => {
-            console.log('ServiceWorker registration failed: ', error);
-          });
-      });
-    }
-  </script>
-
-  <!-- Load scripts in correct order -->
-  <script type="module" src="config.js"></script>
-  <script type="module" src="i18n.js"></script>
-  <script type="module" src="user-data.js"></script>
-  <script type="module" src="user-auth.js"></script>
-  <script type="module" src="firebase-config.js"></script>
+  <!-- User Data -->
+  <script src="user-data.js"></script>
+  
+  <!-- User Authentication -->
+  <script src="user-auth.js"></script>
+  
+  <!-- Auth Components -->
   <script type="text/babel" src="auth.jsx"></script>
+
+  <!-- Admin Dashboard Component -->
   <script type="text/babel" src="admin-dashboard.jsx"></script>
+
+  <!-- Main App -->
   <script type="text/babel" src="app.jsx"></script>
 </body>
 </html>
