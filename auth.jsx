@@ -1,16 +1,4 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import { FIREBASE_CONFIG } from '/config.js';
-import '/i18n.js';
-
-// Initialize Firebase (initializeApp removed as it might be called multiple times, initialize in app.jsx instead)
-let firebaseApp;
-try {
-  firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-} catch (e) {
-  console.error("Firebase initialization error:", e);
-}
-const auth = firebaseApp.auth();
+const { useState } = window.React;
 
 const Auth = ({ onAuthSuccess }) => {
   const [currentAuthScreen, setCurrentAuthScreen] = useState('login'); // 'login', 'register', 'forgotPassword'
@@ -21,140 +9,104 @@ const Auth = ({ onAuthSuccess }) => {
     event.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
-
+    
     const email = event.target.email.value;
     const password = event.target.password.value;
 
     // Basic client-side validation
     if (!email || !password) {
-      setErrorMessage(I18N.t('please_enter_email_and_password'));
+      setErrorMessage('Por favor, introduce email y contraseña.');
       setIsLoading(false);
       return;
     }
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        user.getIdToken().then((token) => {
-          onAuthSuccess(token, false); // Assuming email/password users are not admins by default, adjust as needed
-        });
-      })
-      .catch((error) => {
-        let errorCode = error.code;
-        let errorMessageFB = error.message;
-        console.error("Login error:", errorCode, errorMessageFB);
-        setErrorMessage(I18N.t('invalid_credentials')); // Generic error message for security
-        setIsLoading(false);
-      });
+    // Use our authentication system
+    const result = UserAuth.login(email, password);
+    
+    if (result.success) {
+      onAuthSuccess(result.token, result.isAdmin);
+    } else {
+      setErrorMessage(result.message || 'Credenciales incorrectas');
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = (event) => {
     event.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
-
+    
     const email = event.target.email.value;
     const password = event.target.password.value;
     const confirmPassword = event.target.confirmPassword.value;
 
     if (!email || !password || !confirmPassword) {
-      setErrorMessage(I18N.t('all_fields_are_required'));
+      setErrorMessage('Todos los campos son obligatorios.');
       setIsLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage(I18N.t('passwords_do_not_match'));
+      setErrorMessage('Las contraseñas no coinciden.');
       setIsLoading(false);
       return;
     }
 
-    auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Registered
-        const user = userCredential.user;
-        user.getIdToken().then((token) => {
-          onAuthSuccess(token, false); // Assuming new users are not admins
-        });
-      })
-      .catch((error) => {
-        let errorCode = error.code;
-        let errorMessageFB = error.message;
-        console.error("Registration error:", errorCode, errorMessageFB);
-        if (errorCode === 'auth/email-already-in-use') {
-          setErrorMessage(I18N.t('email_already_registered'));
-        } else {
-          setErrorMessage(I18N.t('registration_failed')); // Generic registration error
-        }
-        setIsLoading(false);
-      });
+    // Try to register the user
+    const registerSuccess = UserAuth.registerUser(email, password);
+    
+    if (registerSuccess) {
+      // Auto-login after successful registration
+      const loginResult = UserAuth.login(email, password);
+      onAuthSuccess(loginResult.token, loginResult.isAdmin);
+    } else {
+      setErrorMessage('Este email ya está registrado.');
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = (event) => {
     event.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
-
+    
     const email = event.target.email.value;
 
     if (!email) {
-      setErrorMessage(I18N.t('please_enter_your_email'));
+      setErrorMessage('Por favor, introduce tu email.');
       setIsLoading(false);
       return;
     }
 
-    auth.sendPasswordResetEmail(email)
-      .then(() => {
-        setErrorMessage(I18N.t('email_sent_with_password_reset_instructions'));
-      })
-      .catch((error) => {
-        let errorCode = error.code;
-        let errorMessageFB = error.message;
-        console.error("Forgot password error:", errorCode, errorMessageFB);
-        setErrorMessage(I18N.t('no_account_found_with_this_email'));
-        setIsLoading(false);
-      });
+    // Use our password reset function
+    const resetSuccess = UserAuth.resetPassword(email);
+    
+    if (resetSuccess) {
+      setErrorMessage('Se ha enviado un correo con instrucciones para restablecer tu contraseña. (Simulado)');
+    } else {
+      setErrorMessage('No se encontró ninguna cuenta con ese email.');
+    }
+    setIsLoading(false);
   };
 
   const handleSocialLogin = (provider) => {
     setIsLoading(true);
     setErrorMessage('');
-
-    let socialProvider;
-    if (provider === 'google') {
-      socialProvider = new firebase.auth.GoogleAuthProvider();
-    } else if (provider === 'facebook') {
-      socialProvider = new firebase.auth.FacebookAuthProvider();
-    } else if (provider === 'discord') {
-      // Discord is not directly supported as a standard provider by Firebase,
-      // you would typically use a custom auth flow or a service like Firebase Functions
-      // to handle Discord OAuth and then sign in to Firebase with a custom token.
-      // For simplicity, and as Discord is not a standard Firebase Auth provider,
-      // we will show an alert indicating it's not directly supported.
-      alert("Discord login is not directly supported. Please refer to Firebase documentation for custom auth flows.");
-      setIsLoading(false);
-      return; // Exit function after alert
-      // If implementing Discord, the flow would be significantly more complex.
-    }
-
-    if (socialProvider) {
-      auth.signInWithPopup(socialProvider)
-        .then((result) => {
-          // Social login successful.
-          const user = result.user;
-          user.getIdToken().then((token) => {
-             onAuthSuccess(token, false); // Social logins are typically not admin
-          });
-        })
-        .catch((error) => {
-          let errorCode = error.code;
-          let errorMessageFB = error.message;
-          console.error("Social login error:", errorCode, errorMessageFB);
-          setErrorMessage(I18N.t('error_logging_in_with_provider', { provider }));
+    
+    // Use our social login function
+    UserAuth.socialLogin(provider)
+      .then(result => {
+        if (result.success) {
+          onAuthSuccess(result.token, result.isAdmin);
+        } else {
+          setErrorMessage(result.message || `Error al iniciar sesión con ${provider}`);
           setIsLoading(false);
-        });
-    }
+        }
+      })
+      .catch(error => {
+        setErrorMessage(`Error al iniciar sesión con ${provider}`);
+        setIsLoading(false);
+      });
   };
 
   let authContent;
@@ -162,21 +114,21 @@ const Auth = ({ onAuthSuccess }) => {
     case 'login':
       authContent = (
         <div className="auth-card">
-          <h2 className="auth-title">{I18N.t('login')}</h2>
+          <h2 className="auth-title">Iniciar Sesión</h2>
           {errorMessage && <p className="auth-error">{errorMessage}</p>}
           <form onSubmit={handleLogin} className="auth-form">
-            <input type="email" name="email" placeholder={I18N.t('email')} required className="auth-input"/>
-            <input type="password" name="password" placeholder={I18N.t('password')} required className="auth-input"/>
+            <input type="email" name="email" placeholder="Email" required className="auth-input"/>
+            <input type="password" name="password" placeholder="Contraseña" required className="auth-input"/>
             <button type="submit" className="auth-button" disabled={isLoading}>
-              {isLoading ? I18N.t('loading') : I18N.t('login')}
+              {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
             </button>
           </form>
           <div className="auth-links">
-            <button onClick={() => setCurrentAuthScreen('register')} className="auth-link-button">{I18N.t('register')}</button>
-            <button onClick={() => setCurrentAuthScreen('forgotPassword')} className="auth-link-button">{I18N.t('forgot_password')}</button>
+            <button onClick={() => setCurrentAuthScreen('register')} className="auth-link-button">Registrarse</button>
+            <button onClick={() => setCurrentAuthScreen('forgotPassword')} className="auth-link-button">¿Olvidaste tu contraseña?</button>
           </div>
           <div className="auth-social-login">
-            <p className="auth-social-text">{I18N.t('or_login_with')}</p>
+            <p className="auth-social-text">O inicia sesión con:</p>
             <div className="auth-social-buttons">
               <button 
                 className="auth-social-button auth-social-google"
@@ -213,18 +165,18 @@ const Auth = ({ onAuthSuccess }) => {
     case 'register':
       authContent = (
         <div className="auth-card">
-          <h2 className="auth-title">{I18N.t('register')}</h2>
+          <h2 className="auth-title">Regístrate</h2>
           {errorMessage && <p className="auth-error">{errorMessage}</p>}
           <form onSubmit={handleRegister} className="auth-form">
-            <input type="email" name="email" placeholder={I18N.t('email')} required className="auth-input"/>
-            <input type="password" name="password" placeholder={I18N.t('password')} required className="auth-input"/>
-            <input type="password" name="confirmPassword" placeholder={I18N.t('confirm_password')} required className="auth-input"/>
+            <input type="email" name="email" placeholder="Email" required className="auth-input"/>
+            <input type="password" name="password" placeholder="Contraseña" required className="auth-input"/>
+            <input type="password" name="confirmPassword" placeholder="Confirmar Contraseña" required className="auth-input"/>
             <button type="submit" className="auth-button" disabled={isLoading}>
-              {isLoading ? I18N.t('loading') : I18N.t('register')}
+              {isLoading ? 'Cargando...' : 'Registrarse'}
             </button>
           </form>
           <div className="auth-links">
-            <button onClick={() => setCurrentAuthScreen('login')} className="auth-link-button">{I18N.t('already_have_an_account_login')}</button>
+            <button onClick={() => setCurrentAuthScreen('login')} className="auth-link-button">¿Ya tienes una cuenta? Iniciar Sesión</button>
           </div>
         </div>
       );
@@ -232,22 +184,22 @@ const Auth = ({ onAuthSuccess }) => {
     case 'forgotPassword':
       authContent = (
         <div className="auth-card">
-          <h2 className="auth-title">{I18N.t('forgot_password')}</h2>
+          <h2 className="auth-title">¿Olvidaste tu contraseña?</h2>
           {errorMessage && <p className="auth-error">{errorMessage}</p>}
           <form onSubmit={handleForgotPassword} className="auth-form">
-            <input type="email" name="email" placeholder={I18N.t('email')} required className="auth-input"/>
+            <input type="email" name="email" placeholder="Email" required className="auth-input"/>
             <button type="submit" className="auth-button" disabled={isLoading}>
-              {isLoading ? I18N.t('loading') : I18N.t('reset_password')}
+              {isLoading ? 'Cargando...' : 'Restablecer Contraseña'}
             </button>
           </form>
           <div className="auth-links">
-            <button onClick={() => setCurrentAuthScreen('login')} className="auth-link-button">{I18N.t('back_to_login')}</button>
+            <button onClick={() => setCurrentAuthScreen('login')} className="auth-link-button">Volver a Iniciar Sesión</button>
           </div>
         </div>
       );
       break;
     default:
-      authContent = <p>{I18N.t('error_loading_auth_screen')}</p>;
+      authContent = <p>Error loading auth screen.</p>;
   }
 
   return (
@@ -256,7 +208,3 @@ const Auth = ({ onAuthSuccess }) => {
     </div>
   );
 };
-
-// Render the Auth component
-const authRoot = ReactDOM.createRoot(document.getElementById('auth-container'));
-authRoot.render(<Auth />);
