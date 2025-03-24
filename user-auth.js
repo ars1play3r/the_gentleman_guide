@@ -1,72 +1,173 @@
-// Add polyfill for Object.entries if needed
-if (!Object.entries) {
-  Object.entries = function(obj) {
-    return Object.keys(obj).map(key => [key, obj[key]]);
-  };
-}
-
 // LocalDB for user authentication
 const UserAuth = {
-  // Initialize (no longer loading/saving local storage for users)
-  init() {
-    // No longer need to load from local storage
-    // this.loadFromLocalStorage();
+  // User storage
+  users: [],
+  
+  // Current authenticated user
+  currentUser: null,
+  
+  // Check if user exists
+  userExists(email) {
+    return this.users.some(user => user.email === email);
   },
-
-  // Register new user (using Firebase Auth directly in auth.jsx)
+  
+  // Register new user
   registerUser(email, password, name = "User") {
-    // Registration now handled by Firebase in auth.jsx
-    console.warn("Register User function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
-    return false; // Indicate not handled here
-  },
-
-  // Login with email and password (using Firebase Auth directly in auth.jsx)
-  login(email, password) {
-    // Login now handled by Firebase in auth.jsx
-    console.warn("Login function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
-    return { success: false, message: "Use Firebase Auth" };
-  },
-
-  // Social login (removed mock and moved to Firebase in auth.jsx)
-  socialLogin(provider) {
-    // Social login is now handled by Firebase in auth.jsx
-    console.warn("Social Login function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
-    return Promise.reject({ success: false, message: "Use Firebase Auth" });
-  },
-
-  // Logout current user (using Firebase Auth directly)
-  logout() {
-    firebase.auth().signOut().then(() => {
-      console.log('User signed out');
-    }).catch((error) => {
-      console.error('Logout Error', error);
-    });
+    if (this.userExists(email)) return false;
+    
+    const isFirstUser = this.users.length === 0;
+    
+    const newUser = {
+      id: Date.now().toString(),
+      email,
+      password, // In real app, this would be hashed
+      name,
+      isAdmin: isFirstUser, // First user gets admin privileges
+      createdAt: new Date(),
+      authMethod: 'email'
+    };
+    
+    this.users.push(newUser);
+    this.saveToLocalStorage();
     return true;
   },
-
+  
+  // Login with email and password
+  login(email, password) {
+    const user = this.users.find(u => u.email === email && u.password === password);
+    if (user) {
+      this.currentUser = user;
+      this.saveToLocalStorage();
+      return {
+        success: true,
+        token: this.generateToken(user),
+        isAdmin: user.isAdmin
+      };
+    }
+    return { success: false, message: "Credenciales inválidas" };
+  },
+  
+  // Social login (mock implementation)
+  socialLogin(provider) {
+    // In a real app, we would authenticate with the actual provider
+    // Here we'll simulate successful authentication
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Simulate response from provider
+        const mockProviderResponse = {
+          email: `user_${Date.now()}@${provider}.com`,
+          name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
+          id: `${provider}_${Date.now()}`
+        };
+        
+        // Check if user already exists
+        let user = this.users.find(u => 
+          u.email === mockProviderResponse.email && 
+          u.authMethod === provider
+        );
+        
+        // Create new user if doesn't exist
+        if (!user) {
+          user = {
+            id: mockProviderResponse.id,
+            email: mockProviderResponse.email,
+            name: mockProviderResponse.name,
+            isAdmin: this.users.length === 0, // First user gets admin privileges
+            createdAt: new Date(),
+            authMethod: provider
+          };
+          this.users.push(user);
+        }
+        
+        this.currentUser = user;
+        this.saveToLocalStorage();
+        
+        resolve({
+          success: true,
+          token: this.generateToken(user),
+          isAdmin: user.isAdmin
+        });
+      }, 1000); // Simulate network delay
+    });
+  },
+  
+  // Logout current user
+  logout() {
+    this.currentUser = null;
+    this.saveToLocalStorage();
+    return true;
+  },
+  
+  // Reset password (mock implementation)
+  resetPassword(email) {
+    const user = this.users.find(u => u.email === email);
+    return !!user; // Return true if user exists
+  },
+  
+  // Generate auth token (simple implementation)
+  generateToken(user) {
+    // In a real app, use a proper JWT library
+    return btoa(JSON.stringify({
+      id: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      exp: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiry
+    }));
+  },
+  
   // Verify token
   verifyToken(token) {
-    console.warn("verifyToken function in user-auth.js is deprecated, Firebase manage users");
-    return {valid: true, user: {isAdmin: false}};
+    try {
+      const decoded = JSON.parse(atob(token));
+      
+      // Check if token is expired
+      if (decoded.exp < Date.now()) {
+        return { valid: false, message: "Token expired" };
+      }
+      
+      // Find user by id
+      const user = this.users.find(u => u.id === decoded.id);
+      if (!user) {
+        return { valid: false, message: "User not found" };
+      }
+      
+      return { 
+        valid: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isAdmin: user.isAdmin
+        }
+      };
+    } catch (error) {
+      return { valid: false, message: "Invalid token" };
+    }
   },
-
-  // Reset password (using Firebase Auth directly in auth.jsx)
-  resetPassword(email) {
-    // Password reset now handled by Firebase in auth.jsx
-    console.warn("resetPassword function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
-    return false; // Indicate not handled here
-  },
-
-  // Save/Load data to/from localStorage (no longer needed for user auth data)
+  
+  // Save data to localStorage
   saveToLocalStorage() {
-    console.warn("saveToLocalStorage in user-auth.js is deprecated as Firebase manages users");
+    localStorage.setItem('userAuthData', JSON.stringify({
+      users: this.users,
+      currentUser: this.currentUser
+    }));
   },
-
+  
+  // Load data from localStorage
   loadFromLocalStorage() {
-    console.warn("loadFromLocalStorage in user-auth.js is deprecated as Firebase manages users");
+    const data = localStorage.getItem('userAuthData');
+    if (data) {
+      const parsed = JSON.parse(data);
+      this.users = parsed.users || [];
+      this.currentUser = parsed.currentUser;
+    }
+  },
+  
+  // Initialize
+  init() {
+    this.loadFromLocalStorage();
   }
 };
 
-// Initialize auth system (init function is now empty, but kept for potential future use)
-window.UserAuth = UserAuth;
+// Initialize auth system
 UserAuth.init();
