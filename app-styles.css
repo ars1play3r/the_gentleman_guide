@@ -1,0 +1,38 @@
+@keyframes flame {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.streak-animation {
+  font-size: 2rem;
+  animation: flame 1s infinite;
+}
+
+@keyframes sticker-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.sticker-animation {
+  animation: sticker-bounce 2s infinite;
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
+}
+
+.confetti-animation {
+  position: absolute;
+  animation: confetti 1.5s forwards;
+}
+
+@keyframes warning-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.warning-animation {
+  animation: warning-bounce 1s ease-in-out;
+}
