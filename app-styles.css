@@ -34,5 +34,5 @@
 }
 
 .warning-animation {
-  animation: warning-bounce 1s ease-in-out;
+  animation: warning-bounce 1s ease-in-out; 
 }

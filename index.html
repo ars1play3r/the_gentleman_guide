@@ -3,8 +3,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Gentleman's Guide - Aprende Barbería</title>
-  <!-- ICONO-->
-  <link rel="icon" href="logo.png" type="image/x-icon">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
   <!-- React 18 Dependencies from JSDelivr -->
   <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
@@ -37,30 +40,45 @@
       }
     }
   </script>
-  
+
   <!-- Custom Styles -->
   <link href="app-styles.css" rel="stylesheet">
   <link href="auth-styles.css" rel="stylesheet">
+  
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js",
+        "react-dom/client": "https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js",
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"
+      }
+    }
+  </script>
 </head>
 <body class="bg-light-gray">
   <div id="root"></div>
-  
+
   <!-- Config -->
-  <script src="config.js"></script>
-  
-  <!-- User Data -->
-  <script src="user-data.js"></script>
-  
+  <script type="module" src="config.js"></script>
+  <script type="module" src="user-data.js"></script>
+  <script type="module" src="user-auth.js"></script>
+  <script type="module" src="i18n.js"></script>
+  <script type="module" src="config-lessons.js"></script>
+  <script type="module" src="firebase-config.js"></script>
+
   <!-- User Authentication -->
-  <script src="user-auth.js"></script>
-  
+
   <!-- Auth Components -->
-  <script type="text/babel" src="auth.jsx"></script>
+  <div id="auth-container"></div>
+  <script type="module" src="auth.jsx"></script>
 
   <!-- Admin Dashboard Component -->
-  <script type="text/babel" src="admin-dashboard.jsx"></script>
+  <div id="admin-dashboard-container"></div>
+  <script type="module" src="admin-dashboard.jsx"></script>
 
   <!-- Main App -->
-  <script type="text/babel" src="app.jsx"></script>
+  <div id="app-container"></div>
+  <script type="module" src="app.jsx"></script>
 </body>
 </html>

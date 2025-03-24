@@ -1,80 +1,72 @@
-// User data and ranking management
-const UserData = {
-  // Current user data
-  current: {
-    name: "User",
-    points: 0,
-    streak: 0,
-    lastLogin: null
-  },
-  
-  // Sample rankings (would be replaced with real data from backend)
-  rankings: [
-    { name: "María G.", points: 1250, streak: 15 },
-    { name: "Carlos R.", points: 980, streak: 8 },
-    { name: "Alejandro M.", points: 895, streak: 12 },
-    { name: "Javier L.", points: 750, streak: 5 },
-    { name: "Ana P.", points: 685, streak: 7 },
-    { name: "Current User", points: 0, streak: 0 }
-  ],
-  
-  // Update user points
-  updatePoints(points) {
-    this.current.points += points;
-    this.updateRankings();
-  },
-  
-  // Update streak
-  updateStreak() {
-    const today = new Date().toDateString();
-    if (this.current.lastLogin !== today) {
-      this.current.streak += 1;
-      this.current.lastLogin = today;
-      this.updateRankings();
-    }
-  },
-  
-  // Update rankings
-  updateRankings() {
-    // Find and update current user in rankings
-    const userIndex = this.rankings.findIndex(user => user.name === "Current User");
-    if (userIndex >= 0) {
-      this.rankings[userIndex].points = this.current.points;
-      this.rankings[userIndex].streak = this.current.streak;
-    }
-    
-    // Sort rankings
-    this.rankings.sort((a, b) => b.points - a.points);
-  },
-  
-  // Initialize user data
+// Add polyfill for Object.entries if needed
+if (!Object.entries) {
+  Object.entries = function(obj) {
+    return Object.keys(obj).map(key => [key, obj[key]]);
+  };
+}
+
+// LocalDB for user authentication
+const UserAuth = {
+  // Initialize (no longer loading/saving local storage for users)
   init() {
-    // Check if user has logged in today
-    const today = new Date().toDateString();
-    const storedData = localStorage.getItem('gentlemansGuideUserData');
-    
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      this.current = parsedData.current;
-      
-      // Update streak if it's a new day
-      if (this.current.lastLogin !== today) {
-        this.current.streak += 1;
-        this.current.lastLogin = today;
-      }
-    } else {
-      this.current.lastLogin = today;
-    }
-    
-    // Save to localStorage
-    this.save();
+    // No longer need to load from local storage
+    // this.loadFromLocalStorage();
   },
-  
-  // Save user data to localStorage
-  save() {
-    localStorage.setItem('gentlemansGuideUserData', JSON.stringify({
-      current: this.current,
-      rankings: this.rankings
-    }));
+
+  // Register new user (using Firebase Auth directly in auth.jsx)
+  registerUser(email, password, name = "User") {
+    // Registration now handled by Firebase in auth.jsx
+    console.warn("Register User function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
+    return false; // Indicate not handled here
+  },
+
+  // Login with email and password (using Firebase Auth directly in auth.jsx)
+  login(email, password) {
+    // Login now handled by Firebase in auth.jsx
+    console.warn("Login function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
+    return { success: false, message: "Use Firebase Auth" };
+  },
+
+  // Social login (removed mock and moved to Firebase in auth.jsx)
+  socialLogin(provider) {
+    // Social login is now handled by Firebase in auth.jsx
+    console.warn("Social Login function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
+    return Promise.reject({ success: false, message: "Use Firebase Auth" });
+  },
+
+  // Logout current user (using Firebase Auth directly)
+  logout() {
+    firebase.auth().signOut().then(() => {
+      console.log('User signed out');
+    }).catch((error) => {
+      console.error('Logout Error', error);
+    });
+    return true;
+  },
+
+  // Verify token
+  verifyToken(token) {
+    console.warn("verifyToken function in user-auth.js is deprecated, Firebase manage users");
+    return {valid: true, user: {isAdmin: false}};
+  },
+
+  // Reset password (using Firebase Auth directly in auth.jsx)
+  resetPassword(email) {
+    // Password reset now handled by Firebase in auth.jsx
+    console.warn("resetPassword function in user-auth.js is deprecated, use Firebase directly in auth.jsx");
+    return false; // Indicate not handled here
+  },
+
+  // Save/Load data to/from localStorage (no longer needed for user auth data)
+  saveToLocalStorage() {
+    console.warn("saveToLocalStorage in user-auth.js is deprecated as Firebase manages users");
+  },
+
+  loadFromLocalStorage() {
+    console.warn("loadFromLocalStorage in user-auth.js is deprecated as Firebase manages users");
   }
 };
+
+// Initialize auth system (init function is now empty, but kept for potential future use)
+window.UserAuth = UserAuth;
+UserAuth.init();

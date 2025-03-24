@@ -1,11 +1,12 @@
 import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-const AdminDashboard = ({ onLogout }) => {
+const AdminDashboard = () => {
   return (
     <div className="admin-dashboard">
       <header className="admin-header">
         <h1>Panel de Administración</h1>
-        <button onClick={onLogout} className="logout-button">Cerrar sesión</button>
+        <button className="logout-button">Cerrar sesión</button>
       </header>
       <nav className="admin-nav">
         <ul>
@@ -43,3 +44,7 @@ const AdminDashboard = ({ onLogout }) => {
     </div>
   );
 };
+
+// Render the AdminDashboard component
+const adminDashboardRoot = ReactDOM.createRoot(document.getElementById('admin-dashboard-container'));
+adminDashboardRoot.render(<AdminDashboard />);

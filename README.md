@@ -1,37 +1,41 @@
-# The Gentleman's Guide - Aprendizaje de Barbería
+<file-changes>
+# The Gentleman's Guide - Barber Learning Platform
 
 ![Demo Preview](/demo-screenshot.png)
 
-Una plataforma interactiva para aprender técnicas modernas de barbería, con sistema de autenticación, lecciones prácticas y panel de administración.
+An interactive platform to learn modern barber techniques, featuring an authentication system, practical lessons, and an admin dashboard.
 
-## Características Principales
+## Key Features
 
-✅ Autenticación segura con email, Google, Facebook y Discord  
-📚 Lecciones interactivas con ejercicios prácticos  
-🏆 Sistema de puntos y rachas diarias  
-🎯 Panel de administración para gestión de contenido  
-💈 Simulaciones de herramientas de barbería  
-📈 Seguimiento de progreso y rankings  
-❤️ Sistema de vidas y recompensas
+✅ Secure Authentication with Email, Google, Facebook, and Discord
+📚 Interactive Lessons with practical exercises
+🏆 Points and Daily Streak System
+🎯 Admin Dashboard for content management
+💈 Barber tool simulations
+📈 Progress Tracking and Rankings
+❤️ Hearts and Gems reward system
+🌐 Multi-language support (Spanish, English, Portuguese)
 
-## Tecnologías Utilizadas
+## Technologies Used
 
-- **Frontend:** React 18 + Tailwind CSS
-- **Autenticación:** JWT + LocalStorage
-- **Base de Datos:** Almacenamiento local en navegador
-- **Animaciones:** CSS custom + SVG
-- **Iconos:** SVG inline y react-icons
-- **Fuentes:** Google Fonts (Inter)
+- **Frontend:** React 18
+- **Styling:** Tailwind CSS, Custom CSS Animations
+- **Authentication:** Firebase Authentication
+- **Database:** Browser Local Storage (for user progress and data - consider Firebase Firestore for production)
+- **Internationalization:** Custom i18n.js
+- **Icons:** Inline SVG
+- **Fonts:** Google Fonts (Inter)
 
-## Requisitos del Sistema
+## System Requirements
 
-- Navegador moderno (Chrome 90+, Firefox 88+, Safari 14+)
-- Conexión a Internet (para recursos externos)
-- Habilitado JavaScript
+- Modern Browser (Chrome 90+, Firefox 88+, Safari 14+)
+- Internet Connection (for external resources - CDNs)
+- JavaScript Enabled
 
-## Instalación y Uso
+## Installation and Usage
 
-1. Clona el repositorio:
+1. Clone the repository:
 ```bash
 git clone https://github.com/tu-usuario/gentlemans-guide.git
 cd gentlemans-guide
+
