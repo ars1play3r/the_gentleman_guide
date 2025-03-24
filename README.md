@@ -1,4 +1,4 @@
-# The Gentleman's Guide - Plataforma de Aprendizaje de Barbería
+# The Gentleman's Guide - Aprendizaje de Barbería
 
 ![Demo Preview](/demo-screenshot.png)
 
