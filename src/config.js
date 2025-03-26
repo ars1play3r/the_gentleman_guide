@@ -1,6 +1,7 @@
 // config.js
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Configuración de Firebase (reemplaza con tus propias credenciales)
 const firebaseConfig = {
@@ -12,8 +13,7 @@ const firebaseConfig = {
   appId: "1:777083189013:web:589fec4fd356e485169b1c"
 };
 
-// Inicializa Firebase
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-export { auth };
+export const auth = getAuth(app);
+export const db = getFirestore(app);
