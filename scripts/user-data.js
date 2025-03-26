@@ -1,80 +1,98 @@
-// User data and ranking management
+import { db, auth } from './config'; // Importa Firebase desde config.js
+
 const UserData = {
-  // Current user data
   current: {
-    name: "User",
+    name: 'User',
     points: 0,
     streak: 0,
     lastLogin: null
   },
-  
-  // Sample rankings (would be replaced with real data from backend)
-  rankings: [
-    { name: "María G.", points: 1250, streak: 15 },
-    { name: "Carlos R.", points: 980, streak: 8 },
-    { name: "Alejandro M.", points: 895, streak: 12 },
-    { name: "Javier L.", points: 750, streak: 5 },
-    { name: "Ana P.", points: 685, streak: 7 },
-    { name: "Current User", points: 0, streak: 0 }
-  ],
-  
-  // Update user points
-  updatePoints(points) {
+  rankings: [],
+
+  // Inicializa los datos del usuario
+  async init() {
+    if (!auth.currentUser) return; // Solo si hay usuario autenticado
+
+    const userDocRef = db.collection('users').doc(auth.currentUser.uid);
+
+    // Obtiene los datos del usuario actual
+    const userDoc = await userDocRef.get();
+    if (userDoc.exists) {
+      this.current = { ...userDoc.data() };
+    } else {
+      // Crea un nuevo usuario si no existe
+      const today = new Date().toDateString();
+      const newUser = {
+        name: auth.currentUser.displayName || 'User',
+        points: 0,
+        streak: 0,
+        lastLogin: today
+      };
+      await userDocRef.set(newUser);
+      this.current = newUser;
+    }
+
+    // Escucha cambios en tiempo real
+    userDocRef.onSnapshot((doc) => {
+      if (doc.exists) {
+        this.current = { ...doc.data() };
+        this.updateRankings();
+      }
+    });
+
+    this.updateRankings();
+  },
+
+  // Actualiza los puntos del usuario
+  async updatePoints(points) {
+    const userRef = db.collection('users').doc(auth.currentUser.uid);
+    await userRef.update({
+      points: this.current.points + points
+    });
     this.current.points += points;
     this.updateRankings();
   },
-  
-  // Update streak
-  updateStreak() {
+
+  // Actualiza la racha de días consecutivos
+  async updateStreak() {
     const today = new Date().toDateString();
-    if (this.current.lastLogin !== today) {
+    const userRef = db.collection('users').doc(auth.currentUser.uid);
+    
+    const data = (await userRef.get()).data();
+    if (data.lastLogin !== today) {
+      await userRef.update({
+        streak: data.streak + 1,
+        lastLogin: today
+      });
       this.current.streak += 1;
       this.current.lastLogin = today;
       this.updateRankings();
     }
   },
-  
-  // Update rankings
-  updateRankings() {
-    // Find and update current user in rankings
-    const userIndex = this.rankings.findIndex(user => user.name === "Current User");
-    if (userIndex >= 0) {
-      this.rankings[userIndex].points = this.current.points;
-      this.rankings[userIndex].streak = this.current.streak;
-    }
-    
-    // Sort rankings
-    this.rankings.sort((a, b) => b.points - a.points);
-  },
-  
-  // Initialize user data
-  init() {
-    // Check if user has logged in today
-    const today = new Date().toDateString();
-    const storedData = localStorage.getItem('gentlemansGuideUserData');
-    
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      this.current = parsedData.current;
-      
-      // Update streak if it's a new day
-      if (this.current.lastLogin !== today) {
-        this.current.streak += 1;
-        this.current.lastLogin = today;
-      }
-    } else {
-      this.current.lastLogin = today;
-    }
-    
-    // Save to localStorage
-    this.save();
-  },
-  
-  // Save user data to localStorage
-  save() {
-    localStorage.setItem('gentlemansGuideUserData', JSON.stringify({
-      current: this.current,
-      rankings: this.rankings
+
+  // Actualiza los rankings desde Firestore
+  async updateRankings() {
+    // Obtiene todos los usuarios ordenados por puntos
+    const rankingsQuery = await db
+      .collection('users')
+      .orderBy('points', 'desc')
+      .get();
+
+    this.rankings = rankingsQuery.docs.map(doc => ({
+      name: doc.data().name,
+      points: doc.data().points,
+      streak: doc.data().streak
     }));
+  },
+
+  // Guarda los datos en Firestore (no necesario si usas métodos anteriores)
+  async save() {
+    const userRef = db.collection('users').doc(auth.currentUser.uid);
+    await userRef.set(this.current);
   }
 };
+
+// Inicializa el sistema al cargar la página
+UserData.init();
+
+export default UserData;
