@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -5,20 +6,25 @@
   <title>The Gentleman's Guide - Aprende Barbería</title>
   <link rel="icon" href="img/logo.png">
 
-  <!-- React 18 Dependencies from JSDelivr -->
+  <!-- React y Babel -->
   <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.8/babel.min.js"></script>
 
-  <!-- Inter Font -->
+  <!-- Configuración de Babel para JSX -->
+  <script>
+    Babel.registerPreset('react', {
+      presets: [require('@babel/preset-react')]
+    });
+  </script>
+
+  <!-- Inter Font y Tailwind CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Custom Tailwind Config -->
+  <!-- Configuración de Tailwind -->
   <script>
     tailwind.config = {
       theme: {
@@ -37,30 +43,22 @@
       }
     }
   </script>
-  
-  <!-- Custom Styles -->
+
+  <!-- Estilos Personalizados -->
   <link href="styles/app-styles.css" rel="stylesheet">
   <link href="styles/auth-styles.css" rel="stylesheet">
 </head>
 <body class="bg-light-gray">
   <div id="root"></div>
-  
-  <!-- Config -->
-  <script src="scripts/config.js"></script>
-  
-  <!-- User Data -->
-  <script src="scripts/user-data.js"></script>
-  
-  <!-- User Authentication -->
-  <script src="scripts/user-auth.js"></script>
-  
-  <!-- Auth Components -->
-  <script type="text/babel" src="scripts/auth.jsx"></script>
 
-  <!-- Admin Dashboard Component -->
-  <script type="text/babel" src="scripts/admin-dashboard.jsx"></script>
+  <!-- Scripts como Módulos ES -->
+  <script type="module" src="scripts/config.js"></script>
+  <script type="module" src="scripts/user-data.js"></script>
+  <script type="module" src="scripts/user-auth.js"></script>
 
-  <!-- Main App -->
-  <script type="text/babel" src="scripts/app.jsx"></script>
+  <!-- Componentes con JSX -->
+  <script type="module" type="text/babel" src="scripts/auth.jsx"></script>
+  <script type="module" type="text/babel" src="scripts/admin-dashboard.jsx"></script>
+  <script type="module" type="text/babel" src="scripts/app.jsx"></script>
 </body>
 </html>
