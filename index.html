@@ -24,27 +24,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Configuración de Tailwind -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#D4AF37',
-            secondary: '#ff4b4b',
-            accent: '#1cb0f6',
-            neutral: '#777',
-            'light-gray': '#f7f7f7',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-        }
-      }
-    }
-  </script>
+  
 
+  <!-- Estilos Personalizados -->
+  <link href="/styles/app-styles.css" rel="stylesheet">
+  <link href="/styles/auth-styles.css" rel="stylesheet">
+</head>
+<body class="bg-light-gray">
+  <div id="root"></div>
 
+  <!-- Scripts como Módulos ES -->
+  <script type="module" src="/scripts/config.js"></script>
+  <script type="module" src="/scripts/user-data.js"></script>
+  <script type="module" src="/scripts/user-auth.js"></script>
+
+  <!-- Componentes con JSX -->
+  <script type="module" type="text/babel" src="/scripts/auth.jsx"></script>
+  <script type="module" type="text/babel" src="/scripts/admin-dashboard.jsx"></script>
+  <script type="module" type="text/babel" src="/scripts/app.jsx"></script>
 </body>
 <footer className="admin-footer">
         <p> 2024 The Gentleman's Guide Admin Dashboard</p>
