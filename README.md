@@ -1,5 +1,6 @@
 <file-changes>
-### The Gentleman's Guide - Barber Learning Platform
+
+## The Gentleman's Guide - Barber Learning Platform
 
 ![Demo Preview](/img/demo-screenshot.png)
 
