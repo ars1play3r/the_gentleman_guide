@@ -1,7 +1,7 @@
 <file-changes>
 ### The Gentleman's Guide - Barber Learning Platform
 
-![Demo Preview](/demo-screenshot.png)
+![Demo Preview](/img/demo-screenshot.png)
 
 An interactive platform to learn modern barber techniques, featuring an authentication system, practical lessons, and an admin dashboard.
 
