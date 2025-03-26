@@ -6,25 +6,27 @@
   <title>The Gentleman's Guide - Aprende Barbería</title>
   <link rel="icon" href="/img/logo.png">
 
-  <!-- React y Babel -->
-  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.8/babel.min.js"></script>
-
-  <!-- Configuración de Babel para JSX -->
-  <script>
-    Babel.registerPreset('react', {
-      presets: [require('@babel/preset-react')]
-    });
-  </script>
-
-  <!-- Inter Font y Tailwind CSS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-
   
+
+  <!-- Configuración de Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#D4AF37',
+            secondary: '#ff4b4b',
+            accent: '#1cb0f6',
+            neutral: '#777',
+            'light-gray': '#f7f7f7',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
 
   <!-- Estilos Personalizados -->
   <link href="/styles/app-styles.css" rel="stylesheet">
